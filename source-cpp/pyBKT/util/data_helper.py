@@ -15,9 +15,9 @@ import requests
 
 def convert_data(url, skill_name, defaults=None, model_type=None, gs_refs=None, resource_refs=None, return_df = False, folds=False):
     if model_type:
-        multilearn, multiprior, multipair, multigs = model_type
+        multilearn, multiprior, multipair, multigs, multigs_cognitive_lable = model_type
     else:
-        multilearn, multiprior, multipair, multigs = [False] * 4
+        multilearn, multiprior, multipair, multigs, multigs_cognitive_lable = [False] * 4
     pd.set_option('mode.chained_assignment', None)
     df = None
 
@@ -58,6 +58,7 @@ def convert_data(url, skill_name, defaults=None, model_type=None, gs_refs=None, 
                  'multiprior': 'correct',
                  'multipair': 'template_id',
                  'multigs': 'template_id',
+                 'multigs_cognitive_lable': 'template_id',
                  'folds': 'user_id',
                  }
 
@@ -70,6 +71,7 @@ def convert_data(url, skill_name, defaults=None, model_type=None, gs_refs=None, 
                 'multiprior': 'Correct First Attempt',
                 'multipair': 'Problem Name',
                 'multigs': 'Problem Name',
+                'multigs_cognitive_lable': 'Problem Name',
                 'folds': 'Anon Student Id',
                                  }
 
@@ -278,6 +280,33 @@ def convert_data(url, skill_name, defaults=None, model_type=None, gs_refs=None, 
             data = [data]
             Data["data"]=np.asarray(data,dtype='int32')
 
+        # multigs_cognitive_lable handling, make data n-dimensional where n is number of g/s types
+        if multigs_cognitive_lable:
+            if "multigs_cognitive_lable" not in defaults:
+                raise KeyError("multigs_cognitive_lable default column not specified")
+            elif defaults["multigs_cognitive_lable"] not in df3.columns:
+                raise KeyError("specified multigs_cognitive_lable default column not in data")
+                
+            all_guess = df3[defaults["multigs_cognitive_lable"]].unique()
+            all_guess = np.sort(all_guess)
+            # map each new guess/slip case to a row [0, # total]
+            if gs_ref is None:
+                gs_ref=dict(zip(all_guess,range(len(df[defaults["multigs_cognitive_lable"]].unique()))))
+            else:
+                for i in all_guess:
+                    if i not in gs_ref:
+                        raise ValueError("Guess rate", i, "not previously fitted")
+            data_ref = np.array(df3[defaults["multigs_cognitive_lable"]].apply(lambda x: gs_ref[x]))
+        
+            # make data n-dimensional, fill in corresponding row and make other non-row entries 0
+            data_temp = np.zeros((len(df3[defaults["multigs_cognitive_lable"]].unique()), len(df3)))
+            for i in range(len(data_temp[0])):
+                data_temp[data_ref[i]][i] = data[i]
+            Data["data"]=np.asarray(data_temp,dtype='int32')
+        else:
+            data = [data]
+            Data["data"]=np.asarray(data,dtype='int32')
+            
         # for when no resource and/or guess column is selected
         if not multilearn and not multipair and not multiprior:
             resource_ref = {}
