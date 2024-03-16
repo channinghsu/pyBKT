@@ -150,8 +150,10 @@ class Model:
         # default best effort prediction of 0.5
         df['correct_predictions'] = 0.5
         df['state_predictions'] = 0.5
+        skillNum = 0
         for skill in all_data:
-            correct_predictions, state_predictions = self._predict(self.fit_model[skill], all_data[skill])
+            correct_predictions, state_predictions = self._predict(self.fit_model[skill], all_data[skill], skillNum)
+            skillNum += 1
             state_predictions = state_predictions[1]
             if all_data[skill]['multiprior_index'] is not None:
                 correct_predictions = np.delete(correct_predictions, all_data[skill]['multiprior_index'])
@@ -435,16 +437,18 @@ class Model:
         fit_model["gs_names"] = data["gs_names"]
         return fit_model
     
-    def _predict(self, model, data):
+    def _predict(self, model, data, skillNum):
         """ Helper function for predicting. """
-        return predict_onestep.run(model, data)
+        return predict_onestep.run(model, data, skillNum)
 
     def _evaluate(self, all_data, metric):
         """ Helper function for evaluating. """
         per_skill = []
         true, pred = [], []
+        skillNum = 0
         for skill in all_data:
-            correct_predictions, state_predictions = self._predict(self.fit_model[skill], all_data[skill])
+            correct_predictions, state_predictions = self._predict(self.fit_model[skill], all_data[skill],skillNum)
+            skillNum += 1
             real_data = all_data[skill]['data']
             true = np.append(true, real_data.sum(axis = 0))
             pred = np.append(pred, correct_predictions)

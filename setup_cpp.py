@@ -25,7 +25,7 @@ class CustomBuildExtCommand(build_ext):
         build_ext.run(self)
 
 FILES = {'synthetic_data_helper.cpp': 'source-cpp/pyBKT/generate/',
-         'predict_onestep_states.cpp': 'source-cpp/pyBKT/fit/', 
+         'predict_onestep_states.cpp': 'source-cpp/pyBKT/fit/',
          'E_step.cpp': 'source-cpp/pyBKT/fit/'}
 
 if platform.system() == 'Darwin':
@@ -51,27 +51,27 @@ LIBRARY_DIRS += [sys.exec_prefix + '/lib']
 clean()
 try:
     module1 = Extension('pyBKT/generate/synthetic_data_helper',
-                        sources = [npath('source-cpp/pyBKT/generate/synthetic_data_helper.cpp')], 
+                        sources = [npath('source-cpp/pyBKT/generate/synthetic_data_helper.cpp')],
                         include_dirs = INCLUDE_DIRS,
                         extra_compile_args = ALL_COMPILE_ARGS,
-                        library_dirs = LIBRARY_DIRS, 
-                        libraries = ALL_LIBRARIES, 
+                        library_dirs = LIBRARY_DIRS,
+                        libraries = ALL_LIBRARIES,
                         extra_link_args = ALL_LINK_ARGS)
 
-    module2 = Extension('pyBKT/fit/E_step', 
+    module2 = Extension('pyBKT/fit/E_step',
                         sources = [npath('source-cpp/pyBKT/fit/E_step.cpp')],
                         include_dirs = INCLUDE_DIRS,
                         extra_compile_args = ALL_COMPILE_ARGS,
-                        library_dirs = LIBRARY_DIRS, 
-                        libraries = ALL_LIBRARIES, 
+                        library_dirs = LIBRARY_DIRS,
+                        libraries = ALL_LIBRARIES,
                         extra_link_args = ALL_LINK_ARGS)
 
     module3 = Extension('pyBKT/fit/predict_onestep_states',
                         sources = [npath('source-cpp/pyBKT/fit/predict_onestep_states.cpp')],
                         include_dirs = INCLUDE_DIRS,
                         extra_compile_args = ALL_COMPILE_ARGS,
-                        library_dirs = LIBRARY_DIRS, 
-                        libraries = ALL_LIBRARIES, 
+                        library_dirs = LIBRARY_DIRS,
+                        libraries = ALL_LIBRARIES,
                         extra_link_args = ALL_LINK_ARGS)
 
     setup(
