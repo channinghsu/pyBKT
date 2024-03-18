@@ -20,7 +20,7 @@ from pyBKT.util import crossvalidate, data_helper, check_data, metrics
 pd.options.display.float_format = '{:,.5f}'.format
 
 class Model:
-    MODELS_BKT = ['multilearn', 'multiprior', 'multipair', 'multigs', 'mutigs_cognitive_lable']
+    MODELS_BKT = ['multilearn', 'multiprior', 'multipair', 'multigs', 'cognitive_label']
     MODEL_ARGS = ['parallel', 'num_fits', 'seed', 'defaults'] + MODELS_BKT
     FIT_ARGS = ['skills', 'num_fits', 'defaults', 'fixed', 'parallel', 'forgets', 'preload'] + MODELS_BKT
     CV_ARGS = FIT_ARGS + ['folds', 'seed']
